@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "@types/nunjucks": "^3.2.6",
+    "nunjucks": "^3.2.4"
+  },
+  "name": "nunjucks",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

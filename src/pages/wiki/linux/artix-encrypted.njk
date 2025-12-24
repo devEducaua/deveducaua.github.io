@@ -1,0 +1,149 @@
+{% extends "layouts/base.njk" %}
+
+{% set title = "moon - wiki/linux" %}
+
+{% block content %}
+<p>um pequeno guia para instalar o artix linux encriptado e não encriptado, esse guia utiliza o <b>luks</b> para a criptografia, <b>ext4</b> para o filesystem, <b>runit</b> para o init system e <b>grub</b> para o bootlader.
+            <br>
+            <p>caso não vá instalar encriptado é só desconsiderar as partes especificadas.</p>
+            <br>
+
+            <p>faço o particionamento dos discos com o cfdisk.</p>
+            <p>ficaram assim: sda1(uefi), sda2(swap), sda3(root)<p
+
+            <p><b>encriptado:</b></p>
+            <pre class="block"><code>
+$ cryptsetup -v luksFormat /dev/sda3
+$ cryptsetup open /dev/sda3 cryptroot
+            </code></pre>
+
+            <p>crie os filesystems:</p>
+            <pre class="block"><code>
+# sem criptografia
+$ mkfs.ext4 /dev/sda3
+# com criptografia
+$ mkfs.ext4 /dev/mapper/cryptroot
+            </code></pre>
+            <pre class="block"><code>
+$ mkswap /dev/sda2
+$ mkfs.fat -F 32 /dev/sda1
+            </code></pre>
+
+            <p>monte as partições:</p>
+            <pre class="block"><code>
+$ mkdir /mnt/boot
+$ mount /dev/sda1 /mnt/boot
+$ swapon /dev/sda2
+            </code></pre>
+            <pre class="block"><code>
+# sem criptografia
+$ mount /dev/sda3 /mnt
+# com criptografia
+$ mount /dev/mapper/cryptroot /mnt
+            </code></pre>
+
+            <p>instalar a base:</p>
+            <p><i>- os softwares listados a seguir são apenas uma escolha pessoal que este guia tomou.</i></p>
+            <pre class="block"><code>
+$ basetrap /mnt base base-devel linux linux-firmware runit elogind-runit
+
+$ basestrap /mnt grub efibootmgr networkmanager networkmanager-runit vim
+            </code></pre>
+
+            <p><b>encriptado:</b></p>
+            <pre class="block"><code>
+$ basetrap /mnt lvm2 cryptsetup
+            </code></pre>
+
+            <p>chroot:</p>
+            <pre class="block"><code>
+$ fstabgen -U /mnt >> /mnt/etc/fstab
+$ artix-chroot /mnt
+            </code></pre>
+
+            <p>dentro do chroot:</p>
+            <pre class="block"><code>
+# este é um zoneinfo de exemplo apenas
+$ ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
+$ hwclock --systohc
+
+# descomente a linha com seu locale de prefencia
+$ vim /etc/locale.gen
+
+$ locale-gen
+
+# novamente apenas um exemplo, coloque o que preferir
+$ echo 'LANG="en_US.UTF-8" >> /etc/locale.conf'
+
+$ echo "myhostname" >. /etc/hostname
+
+# abra o arquivo de hosts com um editor
+$ vim /etc/hosts
+            </code></pre>
+
+            <p>dentro do arquivo hosts:</p>
+            <pre class="block"><code>
+127.0.0.1        localhost
+::1              localhost
+127.0.1.1        myhostname.localdomain  myhostname
+            </code></pre>
+
+            <p>configure o seu usuario:</p>
+            <pre class="block"><code>
+# coloque sua senha de root
+$ passwd
+
+# crie seu usuario
+$ useradd -m -G whell username
+
+# coloque sua senha do usuario
+$ passwd username
+            </code></pre>
+
+            <p><b>encriptado:</b></p>
+            <pre class="block"><code>
+# abra o arquivo com um editor e vá até a linha 55
+$ vim /etc/mkinitcpio.conf
+            </code></pre>
+            <p><b>encriptado</b> voce precisar adicionar encrypt e lvm2 depois de block:</p>
+            <pre class="block"><code>
+HOOKS="base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt lvm2 filesystems fsck"
+            </code></pre>
+
+            <p>tanto setups encriptados quanto não devem rodar:</p>
+            <pre class="block"><code>
+$ mkinitcpio -P
+            </code></pre>
+
+            <p>grub setup:</p>
+            <pre class="block"><code>
+$ grub-install --efi-directory=/boot --bootloader-id=grub /dev/sda
+            </code></pre>
+
+            <p>crie a configuração do grub:</p>
+            <pre class="block"><code>
+$ grub-mkconfig -o /boot/grub/grub.cfg
+            </code></pre>
+
+            <p><b>encriptado:</b></p>
+            <pre class="block"><code>
+$ vim /etc/default/grub 
+
+# LUKS_UUID_HERE e ROOT_UUID_HERE são apenas placeholders.
+# dentro do arquivo procure a linha que começa com "GRUB_CMDLINX_LINUX_DEFAULT" e substitua por:
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=LUKS_UUID_HERE:cryptroot root=UUID=ROOT_UUID_HERE"
+
+# substitua os placeholders
+sed -i "s|LUKS_UUID_HERE|$(blkid -o value -u UUID /dev/sda3)|" /etc/default/grub
+sed -i "s|ROOT_UUID_HERE|$(blkid -o value -u UUID /dev/mapper/cryptroot)|" /etc/default/grub
+            </code></pre>
+
+            <p>saia do chroot e reboot:</p>
+            <pre class="block"><code>
+$ exit
+$ umount -R /mnt
+$ reboot
+            </code></pre>
+
+{% endblock %}

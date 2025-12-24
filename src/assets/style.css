@@ -1,0 +1,118 @@
+:root {
+    --bg: #000000;
+    --fg: #777777;
+    /* --fg: #c9c9c9; */
+    --org: #d17e25;
+    --drk: #444444;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+
+@font-face {
+    font-family: "Krypton";
+    src: url(./MonaspaceKrypton-Regular.otf) format("opentype");
+}
+
+@media (min-width: 600px) {
+    main {
+        width: 600px;
+    }
+}
+
+body {
+    font-family: "Krypton";
+    font-display: optional;
+    background-color: var(--bg);
+    color: var(--fg);
+    padding: 50px;
+    font-size: 14px;
+}
+
+::selection,
+::-moz-selection {
+    background-color: var(--fg);
+    color: var(--bg);
+}
+
+#moon {
+    font-size: 0.8em;
+    margin-bottom: 50px;
+}
+
+#moon a {
+    text-decoration: none;
+    color: var(--fg);
+}
+
+#navbar ul {
+    font-size: 1.1em;
+    display: flex;
+    list-style-type: none;
+}
+
+#navbar ul li {
+    margin-left: 10px;
+}
+
+#content {
+    padding: 10px;
+}
+
+#content #indent {
+    margin: 10px 25px;
+}
+
+#posts-list {
+    margin: 10px;
+    line-height: 30px;
+    padding-left: 0px;
+}
+
+#posts-list li a {
+    color: var(--drk);
+}
+
+#posts-list li::before {
+    content: "";
+}
+
+#content ul {
+    line-height: 25px;
+    margin: 10px;
+}
+
+#content ul li {
+    list-style-type: none;
+}
+
+#content ul li::before {
+    content: "- ";
+}
+
+a {
+    text-decoration: none;
+    color: var(--drk);
+}
+
+b {
+    font-weight: bold;
+}
+
+.block {
+    background-color: #111;
+    padding: 0px 10px;
+    margin: 10px;
+}
+
+h3::before {
+    content: "- ";
+}
+
+#content #posts-list li a:hover,
+a:hover {
+    color: var(--org);
+}
