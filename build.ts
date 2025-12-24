@@ -23,17 +23,21 @@ for (const file of files) {
 
 await $`cp -r ${assetsDir} ${outDir}/`;
 
+const argv = Bun.argv;
 
-// serve({
-//     port: 8080,
-//     async fetch(req: Request) {
-//         const url = new URL(req.url);
-//         const filepath = url.pathname == "/" ? `${outDir}/index.html` : `${outDir}${url.pathname}`;
-//
-//         const file = Bun.file(filepath);
-//
-//         if (!(await file.exists())) return new Response(Bun.file("dist/404.html"), { status: 404 });
-//
-//         return new Response(file);
-//     }
-// });
+if (argv[2] != "--no-serve") {
+    console.log("serve: on");
+    serve({
+        port: 8080,
+        async fetch(req: Request) {
+            const url = new URL(req.url);
+            const filepath = url.pathname == "/" ? `${outDir}/index.html` : `${outDir}${url.pathname}`;
+
+            const file = Bun.file(filepath);
+
+            if (!(await file.exists())) return new Response(Bun.file("dist/404.html"), { status: 404 });
+
+            return new Response(file);
+        }
+    });
+}
