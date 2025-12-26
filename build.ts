@@ -3,13 +3,38 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path/posix";
 import { $, serve } from "bun";
 import { watch } from "node:fs/promises";
+import { parseArgs } from "bun:util";
+
+const { values, positionals } = parseArgs({
+    args: Bun.argv,
+    options: {
+        watch: {
+            default: false,
+            type: "boolean",
+            short: "w"
+        },
+        server: {
+            default: false,
+            type: "boolean",
+            short: "s"
+        },
+        port: {
+            default: "8080",
+            type: "string",
+            short: "p"
+            
+        }
+    },
+    allowPositionals: true,
+    allowNegative: true
+})
 
 nunjucks.configure("src", { autoescape: true });
 
 const pagesDir = "src/pages";
 const outDir = "dist";
 const assetsDir = "src/assets";
-const port = 8080;
+const port = Number(values.port);
 
 const buildDist = async () => {
     await mkdir(outDir, { recursive: true });
@@ -44,14 +69,13 @@ const server = () => {
             return new Response(file);
         }
     })
-}
-
-const argv = Bun.argv;
-
-if (argv[2] != "--no-server") {
-
     console.log("[SERVER]: on");
     console.log("[PORT]: ", port);
+}
+
+if (values.watch == true && values.server == false) throw new Error("[ERROR]: watch flag needs server");
+
+if (values.watch) {
     server();
 
     const watcher = watch("src", { recursive: true });
@@ -61,4 +85,7 @@ if (argv[2] != "--no-server") {
             console.log(`[BUILD]: updated in ${e.filename}`);
         }
     }
+}
+else if (values.server) {
+    server();
 }
