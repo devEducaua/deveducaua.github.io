@@ -7,28 +7,34 @@ nunjucks.configure("src", { autoescape: true });
 
 const pagesDir = "src/pages";
 const outDir = "dist";
-const assetsDir = "src/assets"
+const assetsDir = "src/assets";
+const port = 8080;
 
-await mkdir(outDir, { recursive: true });
+const buildDist = async () => {
+    await mkdir(outDir, { recursive: true });
 
-const files = await readdir(pagesDir, { recursive: true });
+    const files = await readdir(pagesDir, { recursive: true });
 
-for (const file of files) {
-    if (!file.endsWith(".njk")) continue;
+    for (const file of files) {
+        if (!file.endsWith(".njk")) continue;
 
-    const html = nunjucks.render(path.join("pages", file));
+        const html = nunjucks.render(path.join("pages", file));
 
-    await Bun.write(path.join(outDir, file.replace(".njk", ".html")), html);
+        await Bun.write(path.join(outDir, file.replace(".njk", ".html")), html);
+    }
+
+    await $`cp -r ${assetsDir} ${outDir}/`;
 }
 
-await $`cp -r ${assetsDir} ${outDir}/`;
+buildDist();
+console.log("[SUCCESS]: build with no problems");
 
 const argv = Bun.argv;
-
-if (argv[2] != "--no-serve") {
-    console.log("serve: on");
+if (argv[2] != "--no-server") {
+    console.log("[SERVER]: on");
+    console.log("[PORT]: ", port);
     serve({
-        port: 8080,
+        port: port,
         async fetch(req: Request) {
             const url = new URL(req.url);
             const filepath = url.pathname == "/" ? `${outDir}/index.html` : `${outDir}${url.pathname}`;
@@ -39,5 +45,8 @@ if (argv[2] != "--no-serve") {
 
             return new Response(file);
         }
-    });
+    })
+}
+else {
+    console.log("[SERVER]: off");
 }

@@ -26,7 +26,7 @@ jobs:
         run: bun install
 
       - name: build website
-        run: bun build.ts --no-serve
+        run: bun build.ts --no-server
 
       - name: upload pages artifact
         uses: actions/upload-pages-artifact@v3
