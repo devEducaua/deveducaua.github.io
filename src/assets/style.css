@@ -34,7 +34,7 @@ body {
 
 ::selection,
 ::-moz-selection {
-    background-color: var(--fg);
+    background-color: var(--org);
     color: var(--bg);
 }
 
