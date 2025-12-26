@@ -2,6 +2,7 @@ import nunjucks from "nunjucks";
 import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path/posix";
 import { $, serve } from "bun";
+import { watch } from "node:fs/promises";
 
 nunjucks.configure("src", { autoescape: true });
 
@@ -27,12 +28,9 @@ const buildDist = async () => {
 }
 
 buildDist();
-console.log("[SUCCESS]: build with no problems");
+console.log("[BUILD]: success");
 
-const argv = Bun.argv;
-if (argv[2] != "--no-server") {
-    console.log("[SERVER]: on");
-    console.log("[PORT]: ", port);
+const server = () => {
     serve({
         port: port,
         async fetch(req: Request) {
@@ -47,6 +45,20 @@ if (argv[2] != "--no-server") {
         }
     })
 }
-else {
-    console.log("[SERVER]: off");
+
+const argv = Bun.argv;
+
+if (argv[2] != "--no-server") {
+
+    console.log("[SERVER]: on");
+    console.log("[PORT]: ", port);
+    server();
+
+    const watcher = watch("src", { recursive: true });
+    for await (const e of watcher) {
+        if (e.eventType == "rename") {
+            buildDist();
+            console.log(`[BUILD]: updated in ${e.filename}`);
+        }
+    }
 }
