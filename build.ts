@@ -3,38 +3,13 @@ import { mkdir, readdir } from "node:fs/promises";
 import path from "node:path/posix";
 import { $, serve } from "bun";
 import { watch } from "node:fs/promises";
-import { parseArgs } from "bun:util";
-
-const { values, positionals } = parseArgs({
-    args: Bun.argv,
-    options: {
-        watch: {
-            default: false,
-            type: "boolean",
-            short: "w"
-        },
-        server: {
-            default: false,
-            type: "boolean",
-            short: "s"
-        },
-        port: {
-            default: "8080",
-            type: "string",
-            short: "p"
-            
-        }
-    },
-    allowPositionals: true,
-    allowNegative: true
-})
 
 nunjucks.configure("src", { autoescape: true });
 
 const pagesDir = "src/pages";
 const outDir = "dist";
 const assetsDir = "src/assets";
-const port = Number(values.port);
+const port = 8080;
 
 const buildDist = async () => {
     await mkdir(outDir, { recursive: true });
@@ -60,8 +35,11 @@ const server = () => {
         port: port,
         async fetch(req: Request) {
             const url = new URL(req.url);
-            const filepath = url.pathname == "/" ? `${outDir}/index.html` : `${outDir}${url.pathname}`;
+            let pathname = url.pathname;
 
+            if (pathname.endsWith("/")) pathname += "index.html";
+
+            const filepath = `${outDir}${pathname}`;
             const file = Bun.file(filepath);
 
             if (!(await file.exists())) return new Response(Bun.file("dist/404.html"), { status: 404 });
@@ -69,13 +47,14 @@ const server = () => {
             return new Response(file);
         }
     })
-    console.log("[SERVER]: on");
-    console.log("[PORT]: ", port);
 }
 
-if (values.watch == true && values.server == false) throw new Error("[ERROR]: watch flag needs server");
+const argv = Bun.argv;
 
-if (values.watch) {
+if (argv[2] != "--no-server") {
+
+    console.log("[SERVER]: on");
+    console.log("[PORT]: ", port);
     server();
 
     const watcher = watch("src", { recursive: true });
@@ -85,7 +64,4 @@ if (values.watch) {
             console.log(`[BUILD]: updated in ${e.filename}`);
         }
     }
-}
-else if (values.server) {
-    server();
 }
