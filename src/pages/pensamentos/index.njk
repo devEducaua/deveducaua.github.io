@@ -1,0 +1,17 @@
+{% extends "layouts/base.njk" %}
+
+{% set title = "moon - pensamentos" %}
+
+{% macro post(path, name)%}
+    <li><a href="{{ path }}">{{ name }}</a></li>
+{% endmacro %}
+
+{% block content %}
+<!-- p><i>eu não pensei ainda.</i></p -->
+
+<ul id="indent">
+    {{ post("./tedio.html", "tedio") | safe }}
+</ul>
+
+
+{% endblock %}
