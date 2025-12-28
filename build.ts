@@ -61,7 +61,6 @@ if (argv[2] != "--no-server") {
     for await (const e of watcher) {
         if (e.eventType == "rename") {
             buildDist();
-            console.log(`[BUILD]: updated in ${e.filename}`);
         }
     }
 }
