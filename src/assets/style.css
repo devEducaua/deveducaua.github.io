@@ -64,20 +64,6 @@ article #indent {
     margin: 10px 25px;
 }
 
-#posts-list {
-    margin: 10px;
-    line-height: 30px;
-    padding-left: 0px;
-}
-
-#posts-list li a {
-    color: var(--drk);
-}
-
-#posts-list li::before {
-    content: "";
-}
-
 article ul {
     line-height: 25px;
     margin: 10px;
@@ -123,7 +109,6 @@ h3::before {
 .warn:hover,
 i:hover,
 b:hover,
-article #posts-list li a:hover,
 a:hover {
     color: var(--org);
 }
