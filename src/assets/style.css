@@ -120,6 +120,9 @@ h3::before {
     content: "- ";
 }
 
+.warn:hover,
+i:hover,
+b:hover,
 #content #posts-list li a:hover,
 a:hover {
     color: var(--org);
