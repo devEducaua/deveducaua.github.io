@@ -2,15 +2,16 @@
 
 {% set title = "moon - pensamentos" %}
 
-{% macro post(path, name)%}
-    <li><a href="{{ path }}">{{ name }}</a></li>
+{% macro post(path, name, date)%}
+    <li><span>{{ date }}</span> <a href="{{ path }}">{{ name }}</a></li>
 {% endmacro %}
 
 {% block content %}
 <!-- p><i>eu não pensei ainda.</i></p -->
 
 <ul id="indent">
-    {{ post("./tedio.html", "o sentimento mais importante") | safe }}
+    {{ post("./tedio.html", "o sentimento mais importante", "2025-12-29") | safe }}
+    {{ post("./carros.html", "carros", "2025-12-29") | safe }}
 </ul>
 
 {% endblock %}
