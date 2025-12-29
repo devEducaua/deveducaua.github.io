@@ -95,6 +95,12 @@ body {
     margin: 10px 30px;
 }
 
+.warn {
+    text-align: center;
+    margin: 10px;
+    font-weight: bold;
+}
+
 a {
     text-decoration: none;
     color: var(--drk);
