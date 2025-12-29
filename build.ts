@@ -52,15 +52,7 @@ const server = () => {
 const argv = Bun.argv;
 
 if (argv[2] != "--no-server") {
-
     console.log("[SERVER]: on");
     console.log("[PORT]: ", port);
     server();
-
-    const watcher = watch("src", { recursive: true });
-    for await (const e of watcher) {
-        if (e.eventType == "rename") {
-            buildDist();
-        }
-    }
 }
