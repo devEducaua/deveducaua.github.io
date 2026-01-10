@@ -101,7 +101,10 @@ b {
     margin: 10px;
 }
 
-h3::before {
+h3::before,
+h4::before,
+h5::before,
+h6::before {
     content: "- ";
 }
 
