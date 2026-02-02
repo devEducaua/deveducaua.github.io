@@ -95,6 +95,20 @@ b {
     font-weight: bold;
 }
 
+table {
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+td, tr, th {
+    border: 1px solid var(--drk);
+    padding: 5px;
+}
+
+th {
+    text-align: left;
+}
+
 .block {
     background-color: #111;
     padding: 0px 10px;
