@@ -80,6 +80,14 @@ article ul li::before {
     margin: 10px 30px;
 }
 
+footer {
+    display: flex;
+    margin: 10px 30px;
+    p {
+        margin: 0px 10px;
+    }
+}
+
 .warn {
     text-align: center;
     margin: 10px;
